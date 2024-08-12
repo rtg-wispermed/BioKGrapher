@@ -1,4 +1,5 @@
 # BioKGrapher
+### repo is in progress
 ## Overview
 BioKGrapher is a comprehensive tool designed for the automatic construction of knowledge graphs (KGs) from large-scale biomedical literature, processing PubMed IDs as input. By leveraging NLP techniques, BioKGrapher extracts and ranks biomedical concepts, integrating them into structured KGs. This tool can be valuable to construct specialized KGs to get a conceptual view on a topic of interest or to export the KG for further applications such as predictive modeling, drug repurposing, document classification, RAG and decision support systems.
 ## Demo
@@ -37,7 +38,24 @@ Once you have obtained a license, sign into your NIH profile / UMLS license and 
 Unzip the model into the empty models folder.
 
 ### Download required UMLS files
-[Download the Full UMLS Release Files](https://www.nlm.nih.gov/research/umls/licensedcontent/umlsknowledgesources.html) and replace the following UMLS placeholder files with the ones in your UMLS folder:
+[Download the Full UMLS Release Files](https://www.nlm.nih.gov/research/umls/licensedcontent/umlsknowledgesources.html) and replace the following UMLS placeholder files with the ones from your UMLS Rlease Files:
 - MRCONSO.RRF
 - MRHIER.RRF
 - MRREL.RRF
+
+It is recommended to stick to a UMLS Rlease that is the same version or newer to the one that was used in the MedCAT model, eg. UMLS Release **2022AA** and newer.
+
+## Building the Index
+Navigate to the index/baseline folder
+```bash
+cd index/baseline
+```
+
+Download the PubMed baseline files:
+```bash
+wget -nc ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/*.xml.gz
+```
+and also (optionally) add the latest Updatefiles for the latest publications:
+```bash
+wget -nc ftp://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/*.xml.gz
+```
