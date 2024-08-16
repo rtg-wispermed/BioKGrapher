@@ -42,6 +42,7 @@ Unzip the model into the empty models folder.
 - MRCONSO.RRF
 - MRHIER.RRF
 - MRREL.RRF
+- MRDEF.RRF
 
 It is recommended to stick to a UMLS Rlease that is the same version or newer to the one that was used in the MedCAT model, eg. UMLS Release **2022AA** and newer.
 
