@@ -1,4 +1,7 @@
 # BioKGrapher
+
+[![Affiliated with RTG WisPerMed](https://img.shields.io/badge/Affiliated-RTG%202535%20WisPerMed-blue)](https://wispermed.org/)
+
 ### repo is in progress
 ## Overview
 BioKGrapher is a comprehensive tool designed for the automatic construction of knowledge graphs (KGs) from large-scale biomedical literature, processing PubMed IDs as input. By leveraging NLP techniques, BioKGrapher extracts and ranks biomedical concepts, integrating them into structured KGs. This tool can be valuable to construct specialized KGs to get a conceptual view on a topic of interest or to export the KG for further applications such as predictive modeling, drug repurposing, document classification, RAG and decision support systems.
