@@ -1,0 +1,11 @@
+# Example PMID file for BioKGrapher
+# Each line should contain one PubMed ID (PMID)
+# Lines starting with # are comments and will be ignored
+#
+# You can obtain PMIDs from PubMed searches at:
+# https://pubmed.ncbi.nlm.nih.gov/
+#
+# Example PMIDs (replace with your own):
+12345678
+23456789
+34567890
