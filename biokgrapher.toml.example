@@ -1,0 +1,57 @@
+# BioKGrapher configuration. Copy to `biokgrapher.toml` and edit paths.
+# Every value here has a built-in default; you only need to set the paths
+# that point at your UMLS Release files and MedCAT model pack.
+
+[scoring]
+# Paper §4.3-4.4:  S(c) = alpha * norm(D_KL) + beta * norm(local_freq)
+alpha = 0.5          # weight of the (normalized) KL-divergence term
+beta = 0.5           # weight of the (normalized) local-frequency term
+top_k = 2500         # number of top-scoring concepts kept for the graph
+max_depth = 5        # hierarchy depth shown in the treemap / sunburst / icicle
+exclude_subset = true  # compute KLD with excluding subsets (paper §4.3)
+
+[umls]
+# Replace with the real RRF files from your licensed UMLS Release.
+mrconso = "data/umls/MRCONSO.RRF"
+mrhier  = "data/umls/MRHIER.RRF"
+mrrel   = "data/umls/MRREL.RRF"
+mrdef   = "data/umls/MRDEF.RRF"
+# Target terminologies offered in the UI (MRHIER SAB values).
+terminologies = ["SNOMEDCT_US", "NCI", "MSH", "MSHGER", "LNC", "ATC",
+                 "ICD10", "ICD10CM", "ICD10PCS", "FMA"]
+# Which MRDEF sources (SAB) to keep as hover definitions.
+definition_sources = ["NCI"]
+
+[annotate]
+# MedCAT model pack (.zip) — SNOMED International pack.
+model_pack = "models/mc_modelpack_snomed_int_16_mar_2022_25be3857ba34bdd5.zip"
+n_process = 0                 # 0 = auto (cpu_count - 1)
+batch_size_chars = 5000000    # MedCAT multiprocessing batch budget
+cui_filter = []               # empty = link all CUIs (paper default)
+tui_filter = []               # empty = keep all semantic types
+# "snomed": model emits SNOMED codes, mapped to CUIs via MRCONSO during ingest-umls
+# (correct for the SNOMED pack above). Use "none" for a UMLS-Full pack that emits CUIs.
+map_codes = "snomed"
+meta_cat = false      # run MetaCAT (Status) meta-annotations
+# spell_check = false # override the model's spell-check setting
+
+[download]
+base_url = "https://ftp.ncbi.nlm.nih.gov/pubmed"
+raw_dir = "data/pubmed"       # where .xml.gz files are mirrored
+max_concurrency = 4
+
+[store]
+db_path = "biokg.db"
+commit_every = 5000
+checkpoint_dir = "data/medcat_ckpt"
+index_mesh = true             # build a MeSH->PMID index so presets resolve instantly
+
+[server]
+host = "0.0.0.0"
+port = 6006
+preset_folder = "presets"     # *.txt files of PMIDs, one per line
+max_pmids = 500000            # hard cap on an uploaded/pasted PMID list
+max_edges = 4000              # hard cap on KG edges returned to the browser
+# MeSH terms (or descriptor UIs) offered as predefined presets, resolved from the
+# MeSH index built during `build`. `biokgrapher precompute` caches their full graphs.
+mesh_presets = ["Melanoma", "Diabetes Mellitus", "Alzheimer Disease"]

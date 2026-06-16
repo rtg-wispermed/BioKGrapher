@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BioKGrapher</title>
+  <link rel="stylesheet" href="/static/app.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>BioKGrapher</h1>
+    <span class="subtitle">Auto-generated knowledge graphs for conditions</span>
+    <span id="health" class="health" title="backend status">●</span>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <fieldset>
+        <legend>PMID source</legend>
+        <label><input type="radio" name="source" value="preset" checked /> Condition preset</label>
+        <select id="preset"></select>
+        <label class="mt"><input type="radio" name="source" value="custom" /> Paste / upload PMIDs</label>
+        <textarea id="pmids" rows="5" placeholder="One PMID per line…" disabled></textarea>
+        <div class="row">
+          <input type="file" id="file" accept=".txt" disabled />
+        </div>
+        <div id="upload-info" class="muted"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Target terminology</legend>
+        <select id="terminology"></select>
+      </fieldset>
+
+      <fieldset>
+        <legend>Parameters</legend>
+        <label>α (KL weight) <output id="alpha-v"></output></label>
+        <input type="range" id="alpha" min="0" max="2" step="0.05" />
+        <label>β (frequency weight) <output id="beta-v"></output></label>
+        <input type="range" id="beta" min="0" max="2" step="0.05" />
+        <label>top-k concepts <output id="top_k-v"></output></label>
+        <input type="range" id="top_k" min="50" max="10000" step="50" />
+        <label>max depth <output id="max_depth-v"></output></label>
+        <input type="range" id="max_depth" min="1" max="10" step="1" />
+        <label>max graph edges <output id="max_edges-v"></output></label>
+        <input type="range" id="max_edges" min="100" max="10000" step="100" />
+      </fieldset>
+
+      <button id="generate">⟳ Generate</button>
+    </aside>
+
+    <main>
+      <nav class="tabs">
+        <button class="tab active" data-view="treemap">Treemap</button>
+        <button class="tab" data-view="sunburst">Sunburst</button>
+        <button class="tab" data-view="icicle">Icicle</button>
+        <button class="tab" data-view="graph">Knowledge Graph</button>
+        <button class="tab" data-view="trends">Trends</button>
+      </nav>
+
+      <div class="view-wrap">
+        <div id="view-treemap" class="view"></div>
+        <div id="view-sunburst" class="view hidden"></div>
+        <div id="view-icicle" class="view hidden"></div>
+        <div id="view-graph" class="view hidden"></div>
+        <div id="view-trends" class="view hidden"></div>
+        <div id="overlay" class="overlay hidden"><div class="spinner"></div><span>Computing…</span></div>
+        <aside id="panel" class="panel hidden"></aside>
+      </div>
+
+      <div id="meta" class="meta"></div>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

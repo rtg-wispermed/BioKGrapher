@@ -2,64 +2,87 @@
 
 [![Affiliated with RTG WisPerMed](https://img.shields.io/badge/Affiliated-RTG%202535%20WisPerMed-blue)](https://wispermed.org/)
 
-### repo is in progress
-## Overview
-BioKGrapher is a comprehensive tool designed for the automatic construction of knowledge graphs (KGs) from large-scale biomedical literature, processing PubMed IDs as input. By leveraging NLP techniques, BioKGrapher extracts and ranks biomedical concepts, integrating them into structured KGs. This tool can be valuable to construct specialized KGs to get a conceptual view on a topic of interest or to export the KG for further applications such as predictive modeling, drug repurposing, document classification, RAG and decision support systems.
-## Demo
-![](https://github.com/rtg-wispermed/BioKGrapher/blob/main/demo.gif)
-## Key Features
-- Automatic Knowledge Graph Construction: Extracts and integrates biomedical concepts from large PMID sets
-- Named Entity Recognition and Linking (NER+NEL): Utilizes [MedCAT](https://github.com/CogStack/MedCAT) for identifying and normalizing biomedical concepts using the UMLS Metathesaurus
-- Concept Weighting and Re-Ranking: Applies Kullback-Leibler divergence and local frequency weighting to identify prevalent concepts specific to the provided set
-- Hierarchical Structuring and Relationship Mapping: Constructs hierarchical knowledge graphs with semantic triples using UMLS's MRHIER and MRREL files
-- Evaluation: Evaluates constructed KGs by comparing them with concepts extracted from evidence-based clinical practice guidelines.
-- Downstream Applications: Demonstrates utility in document classification and an example drug repurposing tasks.
+Automatic construction of biomedical knowledge graphs from PubMed: MedCAT (NER+NEL → UMLS
+concepts), KL-divergence + frequency re-ranking, hierarchy + relation graphs, served by a
+FastAPI + Plotly.js / Cytoscape.js web app.
 
-## Projet Setup
-Clone the Repository:
+![demo](demo.gif)
+
+## Requirements
+
+Python ≥ 3.10.
+
 ```bash
-git clone https://github.com/rtg-wispermed/BioKGrapher.git
-```
-Navigate to the Project
-```bash
-cd BioKGrapher
-```
-Install requirements
-```bash
-pip install -r requirements.txt
+pip install -e ".[annotate,ui]"      # annotate = MedCAT (build host); ui = web app
 ```
 
-## UMLS License Requirement:
-BioKGrapher requires a valid UMLS license to access and use the UMLS Metathesaurus files. Obtain a license from the [UMLS Terminology Services](https://www.nlm.nih.gov/databases/umls.html).
+## Download the required files
 
-## Prerequisites
-### Download public MedCAT Model
-Once you have obtained a license, sign into your NIH profile / UMLS license and [download one of the following public MedCAT models](https://uts.nlm.nih.gov/uts/login?service=https://medcat.rosalind.kcl.ac.uk/auth-callback): 
-- UMLS Full. >4MM concepts trained self-supervsied on MIMIC-III **was used in this work**
-- SNOMED International (Full SNOMED modelpack trained on MIMIC-III)
+A **UMLS license** is required for both downloads: https://uts.nlm.nih.gov/uts/signup-login
 
-Unzip the model into the empty models folder.
+**1. UMLS Metathesaurus — four RRF files (unzipped, plain text).**
+Download the *UMLS Metathesaurus Full Subset* from
+https://www.nlm.nih.gov/research/umls/licensedcontent/umlsknowledgesources.html and copy these
+four `.RRF` files (found in the release's `META/` folder) — **unzipped** — into `data/umls/`:
 
-### Download required UMLS files
-[Download the Full UMLS Release Files](https://www.nlm.nih.gov/research/umls/licensedcontent/umlsknowledgesources.html) and replace the following UMLS placeholder files with the ones from your UMLS Rlease Files:
-- MRCONSO.RRF
-- MRHIER.RRF
-- MRREL.RRF
-- MRDEF.RRF
-
-It is recommended to stick to a UMLS Rlease that is the same version or newer to the one that was used in the MedCAT model, eg. UMLS Release **2022AA** and newer.
-
-## Building the Index
-Navigate to the index/baseline folder
-```bash
-cd index/baseline
+```
+data/umls/MRCONSO.RRF
+data/umls/MRHIER.RRF
+data/umls/MRREL.RRF
+data/umls/MRDEF.RRF
 ```
 
-Download the PubMed baseline files:
-```bash
-wget -nc ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/*.xml.gz
+Use a UMLS release that is the same as, or newer than, the model's source ontology.
+
+**2. MedCAT model pack — SNOMED International (`.zip`).**
+Sign in with your UMLS license and download the **SNOMED International** pack
+`mc_modelpack_snomed_int_16_mar_2022_25be3857ba34bdd5.zip` from
+https://uts.nlm.nih.gov/uts/login?service=https://medcat.rosalind.kcl.ac.uk/auth-callback .
+Leave it **zipped** and place it exactly here:
+
 ```
-and also (optionally) add the latest Updatefiles for the latest publications:
+models/mc_modelpack_snomed_int_16_mar_2022_25be3857ba34bdd5.zip
+```
+
+Then copy the config — its defaults already point at the files above and set `map_codes = "snomed"`
+for this pack, so nothing else needs editing:
+
 ```bash
-wget -nc ftp://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/*.xml.gz
+cp biokgrapher.toml.example biokgrapher.toml
+```
+
+This pack is MedCAT **v1**; v2 auto-converts it on every load (slow). Convert it once and set
+`[annotate].model_pack` to the result for fast loads:
+```bash
+biokgrapher convert-model models/medcat_v2   # prints the path to set as model_pack
+```
+
+PubMed baseline + update files are downloaded automatically — you do not download them yourself.
+
+> Using a UMLS-Full pack instead (one that emits CUIs directly)? Set `[annotate].map_codes = "none"`.
+
+## Build the index and start the app
+
+```bash
+biokgrapher ingest-umls     # parse the RRF files into SQLite (once per UMLS release)
+biokgrapher build           # download PubMed, annotate with MedCAT, build the index (resumable)
+biokgrapher precompute      # cache the predefined preset graphs (optional)
+biokgrapher serve           # http://0.0.0.0:6006
+```
+
+Also: `biokgrapher update` (pull new update files), `biokgrapher build --shard i/k` +
+`biokgrapher merge <shard dbs>` (parallel build across workers), `biokgrapher status`.
+
+## Citation
+
+```bibtex
+@article{schafer2024biokgrapher,
+  title   = {BioKGrapher: Initial evaluation of automated knowledge graph construction from biomedical literature},
+  author  = {Sch{\"a}fer, Henning and Idrissi-Yaghir, Ahmad and Arzideh, Kamyar and Damm, Hendrik and Pakuli, Tabea M. G. and Schmidt, Cynthia S. and Bahn, Mikel and Lodde, Georg and Livingstone, Elisabeth and Schadendorf, Dirk and Nensa, Felix and Horn, Peter A. and Friedrich, Christoph M.},
+  journal = {Computational and Structural Biotechnology Journal},
+  volume  = {24},
+  pages   = {639--660},
+  year    = {2024},
+  doi     = {10.1016/j.csbj.2024.10.017}
+}
 ```

@@ -1,0 +1,24 @@
+# BioKGrapher local data & build artifacts (never commit these)
+biokgrapher.toml
+*.db
+*.db-wal
+*.db-shm
+data/
+models/
+presets/
+*.xml.gz
+*.RRF
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+.venv/
+venv/
+
+# paper PDF (cited via DOI in README)
+*.pdf
