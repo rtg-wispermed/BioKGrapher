@@ -2,9 +2,7 @@
 
 [![Affiliated with RTG WisPerMed](https://img.shields.io/badge/Affiliated-RTG%202535%20WisPerMed-blue)](https://wispermed.org/)
 
-Automatic construction of biomedical knowledge graphs from PubMed: MedCAT (NER+NEL → UMLS
-concepts), KL-divergence + frequency re-ranking, hierarchy + relation graphs, served by a
-FastAPI + Plotly.js / Cytoscape.js web app.
+Automatic construction of biomedical knowledge graphs from PubMed: KL-divergence + frequency re-ranking, hierarchy + relation graphs, served by a web app.
 
 ![demo](demo.gif)
 
